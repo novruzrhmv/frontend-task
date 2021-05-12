@@ -50,6 +50,11 @@ header {
 	border-bottom: 1px solid #ddd;
 }
 
+header logo{
+	display: flex;
+	align-items: center;
+}
+
 .context-actions{
 	display: flex;
 	align-items: center;
@@ -433,6 +438,10 @@ svg.icon{
 
 .tree li ul {
 	margin: 2em 0
+}
+
+.tree .tf-nc.root-category:before{
+	display: none;
 }
 
 .tree li li:before {

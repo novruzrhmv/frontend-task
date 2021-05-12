@@ -37,7 +37,7 @@ scategoryTemplate4  = `<div class="tree-bitem-item-inline scategory-item">
 </div>`,
 
 scategoryTemplate = `<div class="tree-bitem-item-inline category-item">
-	<span class="tf-nc">selam</span>
+	<span class="tf-nc" contenteditable autofocus>Deneme</span>
 	<div class="item-actions">
 		<svg class="icon icon-add" xmlns="http://www.w3.org/2000/svg">
 			<use xlink:href="sprite.svg#icon-add"></use>
@@ -98,7 +98,8 @@ document.querySelectorAll('.icon-edit').forEach( ei => {
 });
 
 const createCategory = (addButton) => {
-	
+	console.log(addButton.parentElement.previousElementSibling);
+	[...document.querySelectorAll('[contenteditable]')].map(el => el.removeAttribute('contenteditable') );
 	if (dez = addButton.closest('.tree-bitem-item-inline').nextElementSibling) {
 		console.log(1)
 		template = document.createElement('li');
