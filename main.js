@@ -1,42 +1,84 @@
 const fitButton = document.querySelector('.context-actions-fit'),
 centerButton = document.querySelector('.context-actions-center'),
 zoomSelect = document.querySelector('#context-zoom'),
-context = document.querySelector('main.context');
+context = document.querySelector('main.context'),
+contextContainer = context.querySelector('.context-container'),
+header = document.querySelector('header'),
+zoomButtons = document.querySelectorAll('#context-actions-minus,#context-actions-plus');
 const tree = document.querySelector('.tree');
 let changeState = false;
 
-const scategoryTemplate3 = `<div class="tree-bitem-item scategory-item">
-	<div class="tree-bitem-item-inline scategory-item">
-		<span>Subcategory 1</span>
-		<div class="item-actions">
-			<svg class="icon icon-add" xmlns="http://www.w3.org/2000/svg">
-				<use xlink:href="sprite.svg#icon-add"></use>
-			</svg>
-			<svg class="icon icon-edit" xmlns="http://www.w3.org/2000/svg">
-				<use xlink:href="sprite.svg#icon-edit"></use>
-			</svg>
-			<svg class="icon icon-close" xmlns="http://www.w3.org/2000/svg">
-				<use xlink:href="sprite.svg#icon-close"></use>
-			</svg>											
-		</div>
-	</div>
-</div>`,
-scategoryTemplate4  = `<div class="tree-bitem-item-inline scategory-item">
-	<span>Category 1</span>
-	<div class="item-actions">
-		<svg class="icon icon-add" xmlns="http://www.w3.org/2000/svg">
-			<use xlink:href="sprite.svg#icon-add"></use>
-		</svg>
-		<svg class="icon icon-edit" xmlns="http://www.w3.org/2000/svg">
-			<use xlink:href="sprite.svg#icon-edit"></use>
-		</svg>
-		<svg class="icon icon-close" xmlns="http://www.w3.org/2000/svg">
-			<use xlink:href="sprite.svg#icon-close"></use>
-		</svg>											
-	</div>
-</div>`,
 
-scategoryTemplate = `<div class="tree-bitem-item-inline category-item">
+const Handlers = {
+	pageLoaded: () => {
+		console.log('hi')
+	},
+
+	createCategory : (addButton) => {
+		console.log(addButton.parentElement.previousElementSibling);
+		[...document.querySelectorAll('[contenteditable]')].map(el => el.removeAttribute('contenteditable') );
+		if (dez = addButton.closest('.tree-bitem-item-inline').nextElementSibling) {
+			console.log(1)
+			template = document.createElement('li');
+			template.innerHTML = scategoryTemplate
+		}
+		else if (dez = addButton.closest('.tree-bitem-item-inline').parentElement) {
+			
+			template = document.createElement('ul');
+			template.appendChild(document.createElement('li')).innerHTML = scategoryTemplate
+			template.setAttribute('child', '1');
+			
+		}
+	
+		iconedit = template.querySelector('.icon-edit');
+		
+		iconedit.addEventListener('click', Handlers.makeEditable.bind(undefined, iconedit));
+		iconadd = template.querySelector('.icon-add')
+		iconadd.addEventListener('click', Handlers.createCategory.bind(undefined, iconadd));
+	
+	
+		iconRemove = template.querySelector('.icon-remove');
+		iconRemove.addEventListener('click', Handlers.removeList.bind(undefined, iconRemove));
+		dez.append(template);
+		
+	},
+
+	removeList : (list) => {
+		elm = list.closest('li');
+		if(elm.parentElement.childNodes.length == 1) {
+			elm.parentElement.remove()
+		}
+		else elm.remove()
+	},
+
+	centerHandler : () => tree.scrollIntoView({behavior: "smooth", block: "center", inline: "center"}),
+
+	zoomOutHandler : () => {
+		scale = Number(contextContainer.style.transform.replace(/\(|\)|scale/g,'')) || 1;
+		scale -= 0.1;
+		scale < 1 ? scale = 1 : '';
+		contextContainer.style.transform = `scale(${scale})`;
+	},
+	
+	zoomInHandler : () => {
+		scale = Number(contextContainer.style.transform.replace(/\(|\)|scale/g,'')) || 1;
+		scale += 0.1;
+		contextContainer.style.transform = `scale(${scale})`;
+	},
+
+	makeEditable : (ei) => {
+		[...document.querySelectorAll('[contenteditable]')].map(el => el !== ei.parentElement.previousElementSibling ? el.removeAttribute('contenteditable') : '');
+		ei.parentElement.previousElementSibling.toggleAttribute('contenteditable')
+		//ei.parentElement.previousElementSibling = false;
+		changeState = !changeState;
+	}
+
+}
+
+Handlers.centerHandler();
+
+
+const scategoryTemplate = `<div class="tree-bitem-item-inline category-item">
 	<span class="tf-nc" contenteditable autofocus>Deneme</span>
 	<div class="item-actions">
 		<svg class="icon icon-add" xmlns="http://www.w3.org/2000/svg">
@@ -52,105 +94,46 @@ scategoryTemplate = `<div class="tree-bitem-item-inline category-item">
 </div>`;
 
 
-const zoomButtons = document.querySelectorAll('#context-actions-minus,#context-actions-plus');
+zoomButtons[0].addEventListener('click', Handlers.zoomOutHandler)
 
-zoomButtons[0].addEventListener('click', () => {
-	zoom = Number(context.querySelector('.context-container').style.zoom) || 1;
-	context.querySelector('.context-container').style.zoom = (zoom - 0.1);
-})
+zoomButtons[1].addEventListener('click', Handlers.zoomInHandler)
 
-zoomButtons[1].addEventListener('click', () => {
-	zoom = Number(context.querySelector('.context-container').style.zoom) || 1;
-	context.querySelector('.context-container').style.zoom = (zoom + 0.1);
-	console.log(zoom)
-})
-
-
-const makeEditable = (ei) => {
-	[...document.querySelectorAll('[contenteditable]')].map(el => el !== ei.parentElement.previousElementSibling ? el.removeAttribute('contenteditable') : '');
-	ei.parentElement.previousElementSibling.toggleAttribute('contenteditable')
-	//ei.parentElement.previousElementSibling = false;
-	changeState = !changeState;
-}
-
-centerButton.addEventListener('click', () => {
-	context.classList.toggle('scrolling')
-	y1 = (context.scrollHeight - context.offsetHeight) / 2;
-	x1 = (context.scrollWidth - context.offsetWidth) / 2;
-	context.scrollTo(x1,y1)
-	context.classList.toggle('scrolling')
-})
+centerButton.addEventListener('click', Handlers.centerHandler)
 
 fitButton.addEventListener('click', () => {
 	contextWidth = context.clientWidth,
-	clientWidth = tree.scrollWidth,
-	zoomRatio = Number(contextWidth / clientWidth).toFixed(2);
-	context.querySelector('.context-container').style.zoom = zoomRatio;
-
+	clientWidth = (tree.querySelector(':scope ul > li > ul') || tree.querySelector(':scope > ul > li > div')).scrollWidth,
+	zoomRatio = Number(contextWidth / clientWidth).toFixed(4);
+	tree.style.transform = `scale(${zoomRatio})`;
+	contextContainer.addEventListener('transitionend', Handlers.centerHandler, { once: true });
 })
 
+
 zoomSelect.addEventListener('change', () => {
-	context.querySelector('.context-container').style.zoom = zoomSelect.value / 100;
+	scale = zoomSelect.value / 100;
+	context.querySelector('.context-container').style.transform = `scale(${scale})`;
 })
 
 document.querySelectorAll('.icon-edit').forEach( ei => {
-	ei.addEventListener('click', () => makeEditable(ei));
-});
-
-const createCategory = (addButton) => {
-	console.log(addButton.parentElement.previousElementSibling);
-	[...document.querySelectorAll('[contenteditable]')].map(el => el.removeAttribute('contenteditable') );
-	if (dez = addButton.closest('.tree-bitem-item-inline').nextElementSibling) {
-		console.log(1)
-		template = document.createElement('li');
-		template.innerHTML = scategoryTemplate
-		/* template.classList.add('tree-bitem-item', 'scategory-item');
-		dez.setAttribute('child', (Number(dez.getAttribute('child')) + 1));
-		template.innerHTML = scategoryTemplate2; */
-	}
-	else if (dez = addButton.closest('.tree-bitem-item-inline').parentElement) {
-		
-		template = document.createElement('ul');
-		template.appendChild(document.createElement('li')).innerHTML = scategoryTemplate
-		template.setAttribute('child', '1');
-		
-	}
-
-	iconedit = template.querySelector('.icon-edit');
-	
-	iconedit.addEventListener('click', makeEditable.bind(undefined, iconedit));
-	iconadd = template.querySelector('.icon-add')
-	iconadd.addEventListener('click', createCategory.bind(undefined, iconadd));
-
-
-	iconRemove = template.querySelector('.icon-remove');
-	iconRemove.addEventListener('click', removeList.bind(undefined, iconRemove));
-	dez.append(template)
-}
+	ei.addEventListener('click', () => Handlers.makeEditable(ei));
+})
 
 document.querySelectorAll('.icon-add').forEach(addButton => {
 	addButton.addEventListener('click', () => {
-		//dez = addButton.closest('.tree-bitem-item') || addButton.closest('.tree-bitem-citem').nextElementSibling;
-		createCategory(addButton)
+		
+		Handlers.createCategory(addButton);
+		setTimeout( () => document.execCommand('selectAll',false,null), 0);
 	})
 })
 
 document.querySelectorAll('.icon-remove').forEach(removeButton => {
-	removeButton.addEventListener('click', () => removeList(removeButton));
+	removeButton.addEventListener('click', () => Handlers.removeList(removeButton));
 })
 
-const removeList = (list) => {
-	elm = list.closest('li');
-	if(elm.parentElement.childNodes.length == 1) {
-		elm.parentElement.remove()
-	}
-	else elm.remove()
-};
 
 
-
+//TOUCH EVENTS
 let isDown = false, startX, startY, scrollLeft, scrollTop;
-
 context.addEventListener('mousedown', (e) => {
   isDown = true;
   if(changeState) if(e.target.getAttribute('contenteditable') !== null) isDown = false;
@@ -176,11 +159,14 @@ context.addEventListener('mouseup', () => {
 context.addEventListener('mousemove', (e) => {
   if(!isDown) return;
   e.preventDefault();
-  const x = e.pageX - context.offsetLeft;
-  const walk = (x - startX) * .5; //scroll-fast
-  const y = e.pageY - context.offsetTop;
-  const walkY = (y - startY) * .5;
-  if(walk > 0 || walkY > 0) context.classList.add('active');
-  context.scrollLeft = scrollLeft - walk;
-  context.scrollTop = scrollTop - walkY;
+  const x = e.pageX - context.offsetLeft,
+  speedX = (x - startX) * .5,
+  y = e.pageY - context.offsetTop,
+  speedY = (y - startY) * .5;
+  if(speedX > 0 || speedY > 0) context.classList.add('active');
+  context.scrollLeft = scrollLeft - speedX;
+  context.scrollTop = scrollTop - speedY;
 })
+
+
+
