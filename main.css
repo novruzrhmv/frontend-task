@@ -217,6 +217,11 @@ svg.icon{
 	margin-top: 2em
 }
 
+.tree li:only-child{
+	padding: 0
+}
+
+
 .tree .tf-nc.root-category:before{
 	display: none;
 }
