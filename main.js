@@ -15,10 +15,8 @@ const Handlers = {
 	},
 
 	createCategory : (addButton) => {
-		console.log(addButton.parentElement.previousElementSibling);
 		[...document.querySelectorAll('[contenteditable]')].map(el => el.removeAttribute('contenteditable') );
 		if (dez = addButton.closest('.tree-bitem-item-inline').nextElementSibling) {
-			console.log(1)
 			template = document.createElement('li');
 			template.innerHTML = scategoryTemplate
 		}
@@ -40,7 +38,8 @@ const Handlers = {
 		iconRemove = template.querySelector('.icon-remove');
 		iconRemove.addEventListener('click', Handlers.removeList.bind(undefined, iconRemove));
 		dez.append(template);
-		
+		template.querySelector('.tf-nc').focus();
+		setTimeout( () => document.execCommand('selectAll',false,null), 10);
 	},
 
 	removeList : (list) => {
@@ -51,19 +50,28 @@ const Handlers = {
 		else elm.remove()
 	},
 
-	centerHandler : () => tree.scrollIntoView({behavior: "smooth", block: "center", inline: "center"}),
+	centerHandler : () => {
+		tree.querySelector(':scope > ul > li').scrollIntoView({behavior: "smooth", block: "center", inline: "center"})
+		/* context.classList.add('scrolling')
+		y1 = (context.scrollHeight - context.offsetHeight) / 2;
+		x1 = (context.scrollWidth - context.offsetWidth) / 2;
+		context.scrollTo(x1,y1)
+		context.classList.remove('scrolling') */
+	},
 
 	zoomOutHandler : () => {
-		scale = Number(contextContainer.style.transform.replace(/\(|\)|scale/g,'')) || 1;
-		scale -= 0.1;
-		scale < 1 ? scale = 1 : '';
-		contextContainer.style.transform = `scale(${scale})`;
+		scale = Number(tree.style.transform.replace(/\(|\)|scale/g,'')) || 1;
+		//scale < 1 ? scale = 1 : '';
+		scale < 0.2 ? (scale < 0.02 ? scale -= 0.001 : scale -= 0.01)  : scale -= 0.1;
+		if(scale > 1) tree.style = `transform: scale(${scale}); transform-origin: 0 0;`;
+		else tree.style.transform = `scale(${scale})`;
 	},
 	
 	zoomInHandler : () => {
-		scale = Number(contextContainer.style.transform.replace(/\(|\)|scale/g,'')) || 1;
-		scale += 0.1;
-		contextContainer.style.transform = `scale(${scale})`;
+		scale = Number(tree.style.transform.replace(/\(|\)|scale/g,'')) || 1;
+		scale += 0.2;
+		if(scale > 1) tree.style = `transform: scale(${scale}); transform-origin: 0 0;`;
+		else tree.style.transform = `scale(${scale})`;
 	},
 
 	makeEditable : (ei) => {
@@ -79,7 +87,7 @@ Handlers.centerHandler();
 
 
 const scategoryTemplate = `<div class="tree-bitem-item-inline category-item">
-	<span class="tf-nc" contenteditable autofocus>Deneme</span>
+	<span class="tf-nc"  spellcheck="false" contenteditable>Deneme</span>
 	<div class="item-actions">
 		<svg class="icon icon-add" xmlns="http://www.w3.org/2000/svg">
 			<use xlink:href="sprite.svg#icon-add"></use>
@@ -101,17 +109,17 @@ zoomButtons[1].addEventListener('click', Handlers.zoomInHandler)
 centerButton.addEventListener('click', Handlers.centerHandler)
 
 fitButton.addEventListener('click', () => {
-	contextWidth = context.clientWidth,
-	clientWidth = (tree.querySelector(':scope ul > li > ul') || tree.querySelector(':scope > ul > li > div')).scrollWidth,
-	zoomRatio = Number(contextWidth / clientWidth).toFixed(4);
-	tree.style.transform = `scale(${zoomRatio})`;
+	zoomRatio = (Math.min(context.offsetWidth / tree.querySelector(':scope > ul').scrollWidth, context.offsetHeight / tree.querySelector(':scope > ul').scrollHeight) - 0.05).toFixed(2);
+	if(zoomRatio > 1) tree.style = `transform: scale(${zoomRatio}); transform-origin: 0 0;`;
+	else tree.style.transform = `scale(${zoomRatio})`;
 	contextContainer.addEventListener('transitionend', Handlers.centerHandler, { once: true });
 })
 
 
 zoomSelect.addEventListener('change', () => {
 	scale = zoomSelect.value / 100;
-	context.querySelector('.context-container').style.transform = `scale(${scale})`;
+	if(scale > 1) tree.style = `transform: scale(${scale}); transform-origin: 0 0;`;
+	else tree.style.transform = `scale(${scale})`;
 })
 
 document.querySelectorAll('.icon-edit').forEach( ei => {
@@ -122,7 +130,8 @@ document.querySelectorAll('.icon-add').forEach(addButton => {
 	addButton.addEventListener('click', () => {
 		
 		Handlers.createCategory(addButton);
-		setTimeout( () => document.execCommand('selectAll',false,null), 0);
+
+
 	})
 })
 

@@ -22,6 +22,10 @@
 	outline: 0;
 }
 
+html, body{
+	height: 100%;
+}
+
 body{
 	background: var(--bg-color);
 	margin: 0;
@@ -94,28 +98,24 @@ header logo{
 
 main{
 	display: flex;
-	margin: auto;
-	width: 100%;
 	flex: 1;
-	overflow: overlay;
+	overflow: auto;
 	cursor: move;
-	zoom: 200%;
-	zoom: 1;
 	transition: all 0.2s;
 	will-change: transform;
 	appearance: none;
 	/* padding: calc(var(--default-padding) * 8) calc(var(--default-padding) * 1); */
 	/* text-align: center; */
+	padding: 0;
 	height: 100%;
 }
 
 .context-container{
-	/* height: 100%; */
-	display: flex;
-	min-width: fit-content;
+	width: fit-content;
 	height: fit-content;
+	background: dodgerblue;
+	display: flex;
 	transition: 250ms ease;
-	background: rebeccapurple;
 	padding: 50vh 50vw;
 }
 
@@ -129,6 +129,9 @@ main{
 	display: inline-flex;
 	flex-direction: column; */
 	/* padding-bottom: calc(var(--default-padding) * 2); */
+	background: dodgerblue;
+	padding: 25vh 25vw;
+	transition: 250ms ease;
 	margin: auto;
 	white-space: nowrap;
 }
@@ -195,9 +198,6 @@ svg.icon{
 
 
 
-.tree {
-	font-size: 16px;
-}
 
 
 .tree ul {
@@ -213,14 +213,14 @@ svg.icon{
 	position: relative;
 }
 
-.tree li ul {
-	margin-top: 2em
-}
-
 .tree li:only-child{
 	padding: 0
 }
 
+
+.tree li ul {
+	margin-top: 2em
+}
 
 .tree .tf-nc.root-category:before{
 	display: none;
@@ -230,6 +230,7 @@ svg.icon{
 	border-top: 1px solid #000;
 	content: "";
 	left: -2.0625em;
+	left: calc((((var(--svg-icon-width) + var(--item-actions-svg-margin)) * 3) / 2) * -1);
 	position: absolute;
 	width: 100%;
 	top: -1em;
@@ -245,8 +246,8 @@ svg.icon{
 
 .tree li li:last-child:before {
 	left: auto;
-	width: calc(50% + 4.125em);
-	right: calc(50% + 2.0625em);
+	width: calc(50%);
+	right: calc(50% + (((var(--svg-icon-width) + var(--item-actions-svg-margin)) * 3) / 2) );
 	width: 50%;
 /* 	right: calc(50% + 1.90625em);
 	width: calc(50% + 3.8125em); */
