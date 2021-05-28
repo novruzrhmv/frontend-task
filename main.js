@@ -44,10 +44,9 @@ const Handlers = {
 
 	removeList : (list) => {
 		elm = list.closest('li');
-		if(elm.parentElement.childNodes.length == 1) {
-			elm.parentElement.remove()
-		}
-		else elm.remove()
+		if(elm.parentElement.childNodes.length == 1) elm = elm.parentElement;
+		if(elm.id == 'root-category') return alert("Root category can't be removed");
+		elm.remove()
 	},
 
 	centerHandler : () => {
@@ -61,7 +60,6 @@ const Handlers = {
 
 	zoomOutHandler : () => {
 		scale = Number(tree.style.transform.replace(/\(|\)|scale/g,'')) || 1;
-		//scale < 1 ? scale = 1 : '';
 		scale < 0.2 ? (scale < 0.02 ? scale -= 0.001 : scale -= 0.01)  : scale -= 0.1;
 		if(scale > 1) tree.style = `transform: scale(${scale}); transform-origin: 0 0;`;
 		else tree.style.transform = `scale(${scale})`;
@@ -77,7 +75,6 @@ const Handlers = {
 	makeEditable : (ei) => {
 		[...document.querySelectorAll('[contenteditable]')].map(el => el !== ei.parentElement.previousElementSibling ? el.removeAttribute('contenteditable') : '');
 		ei.parentElement.previousElementSibling.toggleAttribute('contenteditable')
-		//ei.parentElement.previousElementSibling = false;
 		changeState = !changeState;
 	}
 
@@ -128,10 +125,7 @@ document.querySelectorAll('.icon-edit').forEach( ei => {
 
 document.querySelectorAll('.icon-add').forEach(addButton => {
 	addButton.addEventListener('click', () => {
-		
 		Handlers.createCategory(addButton);
-
-
 	})
 })
 
